@@ -1,0 +1,21 @@
+{
+  "name": "ftiXbackend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Vishwas Paikra <vishwaspaikra007@gmail.com>",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "firebase": "^8.1.1",
+    "razorpay": "^2.0.6",
+    "uuid": "^8.3.1"
+  }
+}

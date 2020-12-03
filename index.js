@@ -8,6 +8,7 @@ const app = express()
 const fb = require('./firebase')
 
 app.use(cors())
+app.options('*', cors());
 app.use(express.json())
 app.use(express.urlencoded({
     extended: true

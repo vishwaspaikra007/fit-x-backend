@@ -35,11 +35,19 @@ app.post('/verifyPayment', async (req, res) => {
             const batch = fb.firestore.batch()
             batch.update(fb.firestore.collection('orders').doc(req.body.payload.payment.entity.order_id),
                 { paymentCaptureDetails: req.body })
-            const cartItems = (await fb.firestore.collection('orders').doc(req.body.payload.payment.entity.order_id).get()).data().cartItems
-            cartItems.forEach(item => {
-                console.log(item.vendorId)
-                batch.update(fb.firestore.collection('vendors').doc(item.vendorId), {orders: fb.arrayUnion(item)})  
-            })
+            // const cartItems = (await fb.firestore.collection('orders').doc(req.body.payload.payment.entity.order_id).get()).data().cartItems
+            // cartItems.forEach(item => {
+            //     console.log(item.vendorId)
+            //     batch.set(
+            //         fb.firestore.collection('vendors')
+            //             .doc(item.vendorId)
+            //                 .collection('orders')
+            //                     .doc(req.body.payload.payment.entity.order_id), 
+            //         {orders: fb.arrayUnion(item)})  
+            // })
+
+            // find a way to update vendors and users
+            // probably with WHatsapp message
             await batch.commit()
             res.json({ status: "ok" })
         } catch (err) {
@@ -65,9 +73,11 @@ app.post('/razorpay', async (req, res) => {
             {
                 amount: req.body.amount * 100,
                 userInfo: req.body.userInfo,
-                cartItems: req.body.cartItems
+                cartItems: req.body.cartItems,
+                userId: req.body.userInfo.uid,
+                vendorIds: req.body.cartItems.map(item => item.vendorId)
             })
-        batch.update(fb.firestore.collection('users').doc(req.body.userInfo.uid), { orders: fb.arrayUnion(response.id) })
+        // batch.update(fb.firestore.collection('users').doc(req.body.userInfo.uid), { orders: fb.arrayUnion(response.id) })
         await batch.commit()
         console.log(response)
         res.json({

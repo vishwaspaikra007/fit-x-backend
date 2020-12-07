@@ -4,7 +4,7 @@ const fb = require('../general/firebase')
 const crypto = require('crypto')
 
 router.post('/payment-captured', async (req, res) => {
-    const secret = "vishwas"
+    const secret = process.env.RAZOR_PAY_SIGNATURE_KEY
     let data = JSON.stringify(req.body)
 
     console.log(data)

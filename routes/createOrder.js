@@ -10,12 +10,42 @@ const razorpay = new Razorpay({
 })
 
 router.post('/create-order', async (req, res) => {
-    console.log("yu")
+    const amt = req.body.amount * 100
     const options = {
-        amount: req.body.amount * 100,
+        amount: amt,
         currency: "INR",
         receipt: uuidv4(),
         payment_capture: 1,
+        "transfers": [
+            {
+                "account": "acc_GDIzLgOfWbGWDY",//Please replace with appropriate ID.
+                "amount": amt*0.5,
+                "currency": "INR",
+                "notes": {
+                    "branch": "Acme Corp Bangalore North",
+                    "name": "Gaurav Kumar"
+                },
+                "linked_account_notes": [
+                    "branch"
+                ],
+                "on_hold": 0,
+                // "on_hold_until": null
+            },
+            {
+                "account": "acc_GC1EQ36h7iygtM",//Please replace with appropriate ID.
+                "amount": amt*0.5,
+                "currency": "INR",
+                "notes": {
+                    "branch": "Acme Corp Bangalore South",
+                    "name": "Saurav Kumar"
+                },
+                "linked_account_notes": [
+                    "branch"
+                ],
+                "on_hold": 0,
+                // "on_hold_until": null
+            }
+        ]
     }
     try {
         const response = await razorpay.orders.create(options)

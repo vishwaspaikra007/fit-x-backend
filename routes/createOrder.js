@@ -16,6 +16,9 @@ router.post('/create-order', async (req, res) => {
         currency: "INR",
         receipt: uuidv4(),
         payment_capture: 1,
+        notes: {
+            userId: req.body.userInfo.uid,
+        },
         "transfers": [
             {
                 "account": "acc_GDIzLgOfWbGWDY",//Please replace with appropriate ID.
@@ -56,7 +59,8 @@ router.post('/create-order', async (req, res) => {
                 userInfo: req.body.userInfo,
                 cartItems: req.body.cartItems,
                 userId: req.body.userInfo.uid,
-                vendorIds: req.body.cartItems.map(item => item.vendorId),
+                vendorIds: Object.keys(req.body.cartItems).map(id => req.body.cartItems[id].vendorId),
+                createdAt: fb.timestamp,
                 status: 'order-created'
             })
         // batch.update(fb.firestore.collection('users').doc(req.body.userInfo.uid), { orders: fb.arrayUnion(response.id) })

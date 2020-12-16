@@ -21,5 +21,6 @@ const firebaseConfig = {
   const timestamp = firebase.firestore.FieldValue.serverTimestamp()
   const increment = firebase.firestore.FieldValue.increment(1)
   const arrayUnion = (newElement) => firebase.firestore.FieldValue.arrayUnion(newElement)
+  const _delete = firebase.firestore.FieldValue.delete()
 
-  module.exports  = {storage, firestore, auth, timestamp, increment, arrayUnion}
+  module.exports  = {_delete, storage, firestore, auth, timestamp, increment, arrayUnion}

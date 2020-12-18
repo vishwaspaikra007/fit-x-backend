@@ -55,9 +55,8 @@ router.post('/create-order', async (req, res) => {
         const batch = fb.firestore.batch()
         batch.set(fb.firestore.collection('orders').doc(response.id),
             {
+                ...req.body,
                 amount: req.body.amount * 100,
-                userInfo: req.body.userInfo,
-                cartItems: req.body.cartItems,
                 userId: req.body.userInfo.uid,
                 vendorIds: Object.keys(req.body.cartItems).map(id => req.body.cartItems[id].vendorId),
                 createdAt: fb.timestamp,

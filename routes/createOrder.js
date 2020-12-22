@@ -17,7 +17,8 @@ router.post('/create-order', async (req, res) => {
         receipt: uuidv4(),
         payment_capture: 1,
         notes: {
-            userId: req.body.userInfo.uid,
+            userId: req.body.type === 'service' ? req.body.userId : req.body.userInfo.uid,
+            type: req.body.type
         },
         "transfers": [
             {
@@ -53,15 +54,27 @@ router.post('/create-order', async (req, res) => {
     try {
         const response = await razorpay.orders.create(options)
         const batch = fb.firestore.batch()
-        batch.set(fb.firestore.collection('orders').doc(response.id),
-            {
+        let ref = 'orders'
+        let body
+        if(req.body.type === 'service') {
+            ref = 'services'
+            body = {
+                ...req.body,
+                amount: req.body.amount * 100,
+                createdAt: fb.timestamp,
+                status: 'purchase initiated'
+            }
+        } else {
+            body = {
                 ...req.body,
                 amount: req.body.amount * 100,
                 userId: req.body.userInfo.uid,
                 vendorIds: Object.keys(req.body.cartItems).map(id => req.body.cartItems[id].vendorId),
                 createdAt: fb.timestamp,
-                status: 'order-created'
-            })
+                status: 'order created'
+            }
+        }
+        batch.set(fb.firestore.collection(ref).doc(response.id), body)
         // batch.update(fb.firestore.collection('users').doc(req.body.userInfo.uid), { orders: fb.arrayUnion(response.id) })
         await batch.commit()
         console.log(response)

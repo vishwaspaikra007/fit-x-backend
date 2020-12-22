@@ -26,20 +26,24 @@ router.post('/payment-captured', async (req, res) => {
         try {
             const batch = fb.firestore.batch()
             const order_id = req.body.payload.payment.entity.order_id
-            
+
             let orderDetails
+            let ref = 'orders'
             try {
                 orderDetails = await razorpay.orders.fetch(order_id)
+                if (orderDetails.notes.type === 'service')
+                    ref = 'services'
                 console.log(orderDetails)
             } catch (error) {
                 return
             }
 
-            batch.update(fb.firestore.collection('orders').doc(order_id),
-                { paymentCaptureDetails: req.body, status: "payment-captured" })
+            batch.update(fb.firestore.collection(ref).doc(order_id),
+                { paymentCaptureDetails: req.body, status: "payment captured" })
 
-            batch.set(fb.firestore.collection('users').doc(orderDetails.notes.userId),
-                { cartItems: fb._delete }, { merge: true })
+            if (!orderDetails.notes.type === 'service')
+                batch.set(fb.firestore.collection('users').doc(orderDetails.notes.userId),
+                    { cartItems: fb._delete }, { merge: true })
             // find a way to update vendors and users
             // probably with WHatsapp message
             await batch.commit()

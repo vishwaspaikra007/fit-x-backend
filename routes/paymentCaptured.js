@@ -41,7 +41,7 @@ router.post('/payment-captured', async (req, res) => {
             batch.update(fb.firestore.collection(ref).doc(order_id),
                 { paymentCaptureDetails: req.body, status: "payment captured" })
 
-            if (!orderDetails.notes.type === 'service')
+            if (!(orderDetails.notes.type === 'service'))
                 batch.set(fb.firestore.collection('users').doc(orderDetails.notes.userId),
                     { cartItems: fb._delete }, { merge: true })
             // find a way to update vendors and users

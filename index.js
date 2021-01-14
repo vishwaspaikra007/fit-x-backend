@@ -6,6 +6,8 @@ const app = express()
 const createOrder = require('./routes/createOrder')
 const paymentFailed = require('./routes/paymentFailed')
 const paymentCaptured = require('./routes/paymentCaptured')
+const deleteProduct = require('./routes/deleteProduct')
+const deleteVendor = require('./routes/deleteVendor')
 const admin_auth = require('./admin/auth')
 app.use(cors(
     {origin: ['http://127.0.0.1:5500', 'http://localhost:5500', 'http://localhost:3001','http://localhost:3000', 'https://vishwaspaikra007.github.io', 'https://fitx-c9b1d.firebaseapp.com'],
@@ -20,6 +22,8 @@ app.use(express.urlencoded({
 app.use(createOrder)  
 app.use(paymentFailed)
 app.use(paymentCaptured)
+app.use(deleteProduct)
+app.use(deleteVendor)
 app.use(admin_auth)
 
 const PORT = process.env.PORT || 3001

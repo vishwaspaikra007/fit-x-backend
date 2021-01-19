@@ -14,7 +14,6 @@ router.post('/payment-captured', async (req, res) => {
     const secret = process.env.RAZOR_PAY_SIGNATURE_KEY
     let data = JSON.stringify(req.body)
 
-    console.log(data)
     const shasum = crypto.createHmac('sha256', secret)
     shasum.update(data)
     const digest = shasum.digest('hex')
@@ -38,18 +37,31 @@ router.post('/payment-captured', async (req, res) => {
                 return
             }
 
+            if (orderDetails.notes.type === 'service') {
+                batch.set(fb.firestore.collection('vendors').doc(orderDetails.notes.vendorId),
+                    { serviceSales: fb.increment }, { merge: true })
+            } else {
+                let doc = await fb.firestore.collection(ref).doc(order_id).get()
+                Object.keys(doc.data().cartItems).map(key => {
+
+                    batch.set(fb.firestore.collection('products').doc(key),
+                    { sales: fb.incrementBy(doc.data().cartItems[key].quantity) }, { merge: true })
+
+                    batch.set(fb.firestore.collection('vendors').doc(doc.data().cartItems[key].vendorId),
+                    { productSales: fb.incrementBy(doc.data().cartItems[key].quantity) }, { merge: true })
+                })
+
+                batch.set(fb.firestore.collection('users').doc(orderDetails.notes.userId),
+                    { cartItems: fb._delete }, { merge: true })
+            }
+
             batch.update(fb.firestore.collection(ref).doc(order_id),
                 { paymentCaptureDetails: req.body, status: "payment captured" })
 
-            if (!(orderDetails.notes.type === 'service'))
-                batch.set(fb.firestore.collection('users').doc(orderDetails.notes.userId),
-                    { cartItems: fb._delete }, { merge: true })
             if (orderDetails.notes.couponCode) {
                 let couponCode = orderDetails.notes.couponCode
-                if (couponCode) {
-                     batch.set(fb.firestore.collection('web_config').doc('coupons'),
-                        { [couponCode]: { count: fb.incrementBy(-1) } }, { merge: true })
-                }
+                batch.set(fb.firestore.collection('web_config').doc('coupons'),
+                    { [couponCode]: { count: fb.incrementBy(-1) } }, { merge: true })
             }
             // find a way to update vendors and users
             // probably with WHatsapp message

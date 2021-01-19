@@ -109,7 +109,8 @@ router.post('/create-order', async (req, res) => {
         notes: {
             userId: req.body.type === 'service' ? req.body.userId : req.body.userInfo.uid,
             type: req.body.type,
-            coupon: req.body.coupon && req.body.coupon.couponCode
+            couponCode: req.body.coupon && req.body.coupon.couponCode,
+            vendorId: req.body.type === 'service' ? req.body.vendorId : undefined
         },
         transfers: transfers
     }

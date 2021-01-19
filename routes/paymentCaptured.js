@@ -44,6 +44,13 @@ router.post('/payment-captured', async (req, res) => {
             if (!(orderDetails.notes.type === 'service'))
                 batch.set(fb.firestore.collection('users').doc(orderDetails.notes.userId),
                     { cartItems: fb._delete }, { merge: true })
+            if (orderDetails.notes.couponCode) {
+                let couponCode = orderDetails.notes.couponCode
+                if (couponCode) {
+                     batch.set(fb.firestore.collection('web_config').doc('coupons'),
+                        { [couponCode]: { count: fb.incrementBy(-1) } }, { merge: true })
+                }
+            }
             // find a way to update vendors and users
             // probably with WHatsapp message
             await batch.commit()

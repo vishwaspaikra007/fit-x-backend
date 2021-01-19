@@ -108,7 +108,8 @@ router.post('/create-order', async (req, res) => {
         payment_capture: 1,
         notes: {
             userId: req.body.type === 'service' ? req.body.userId : req.body.userInfo.uid,
-            type: req.body.type
+            type: req.body.type,
+            coupon: req.body.coupon && req.body.coupon.couponCode
         },
         transfers: transfers
     }
@@ -128,6 +129,11 @@ router.post('/create-order', async (req, res) => {
                 chargesToServiceInfo: chargesToServiceInfo,
             }
         } else {
+            // let coupon = req.body.coupon
+            // if(coupon) {
+            //     await fb.firestore.collection('web_config').doc('coupons')
+            //     .set({[coupon.couponCode]: { count: fb.incrementBy(-1)}}, {merge: true})
+            // }
             body = {
                 ...req.body,
                 amount: req.body.amount * 100,
